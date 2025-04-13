@@ -15,10 +15,20 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/firebase';
+import { studyAbroadAssistant } from '@/ai/flows/study-abroad-assistant';
 
 export default function Home() {
   const [open, setOpen] = useState(false);
-    const [user, loading, error] = useAuthState(auth);
+  const [user, loading, error] = useAuthState(auth);
+  const [question, setQuestion] = useState('');
+  const [response, setResponse] = useState('');
+
+  const handleSubmit = async () => {
+    if (question) {
+      const result = await studyAbroadAssistant({ query: question });
+      setResponse(result.response);
+    }
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -149,14 +159,22 @@ export default function Home() {
                         <Label htmlFor="question" className="text-right">
                           Ask a question:
                         </Label>
-                        <Textarea id="question" className="col-span-3" />
+                        <Textarea
+                          id="question"
+                          className="col-span-3"
+                          value={question}
+                          onChange={(e) => setQuestion(e.target.value)}
+                        />
                       </div>
                     </div>
                     <SheetFooter>
                       <SheetClose asChild>
-                        <Button type="submit">Submit</Button>
+                        <Button type="submit" onClick={handleSubmit}>
+                          Submit
+                        </Button>
                       </SheetClose>
                     </SheetFooter>
+                    {response && <p>Response: {response}</p>}
                   </SheetContent>
                 </Sheet>
               </div>
