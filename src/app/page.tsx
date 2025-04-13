@@ -1,3 +1,4 @@
+// src/app/page.tsx
 'use client';
 
 import {AuthForm} from '@/components/auth-form';
@@ -12,9 +13,21 @@ import {Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Dia
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '@/firebase';
 
 export default function Home() {
   const [open, setOpen] = useState(false);
+    const [user, loading, error] = useAuthState(auth);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <AuthForm />;
+  }
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full">
